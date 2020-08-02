@@ -1,6 +1,7 @@
 package com.example.tiltsensor
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.hardware.Sensor
 import android.hardware.Sensor.TYPE_ACCELEROMETER
 import android.hardware.SensorEvent
@@ -9,8 +10,11 @@ import android.hardware.SensorManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
+
+    private lateinit var tiltView: TiltView
 
     private val sensorManager: SensorManager by lazy {
         getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -19,8 +23,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+
+        tiltView = TiltView(this)
+        setContentView(tiltView)
+
 
 
     }
@@ -37,8 +49,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(p0: SensorEvent?) {
 
         p0?.let {
-            Log.d("MainActivity", "onSensorChanged: x :+ ${p0.values[0]}, y: ${p0.values[1]}, z: ${p0.values[2]}"  )
+            Log.d("tag", "onSensorChanged: " + "x: ${p0.values[0]}, y: ${p0.values[1]}, z: ${p0.values[2]}")
+
+            tiltView.onSensorEvent(p0)
         }
+
+
     }
 
     override fun onPause() {
